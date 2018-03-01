@@ -1,21 +1,27 @@
 package main
 
-import "github.com/bitlux/connect4/board"
+import (
+	"log"
+
+	"github.com/bitlux/connect4/board"
+	"github.com/bitlux/connect4/player"
+)
 
 func main() {
 
 	b := board.New(6, 7)
 
-	b.Move(1, 1)
-	b.Print()
+	players := []player.Player{player.Human{},
+		player.Human{}}
 
-	b.Move(1, 2)
-	b.Print()
+	for i := 0; i < 10; i++ {
+		b.Print()
 
-	b.Move(1, 1)
-	b.Print()
-
-	b.Move(2, 2)
-	b.Print()
-
+		p := players[i%2]
+		move := p.Move(b)
+		err := b.Move(move, i%2+1)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }

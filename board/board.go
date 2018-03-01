@@ -1,6 +1,10 @@
 package board
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"os/exec"
+)
 
 type cell int
 
@@ -32,34 +36,39 @@ func New(height, width int) *Board {
 func printSep(cols int) {
 	s := "+"
 	for i := 0; i < cols; i++ {
-		s += "----+"
+		s += "-----+"
 	}
 	fmt.Println(s)
 }
 
-func printEmpty(cols int) {
-	s := "|"
-	for i := 0; i < cols; i++ {
-		s += "     |"
+func printRow(cells []cell, printSpace bool) {
+	fmt.Print("|")
+	for _, cell := range cells {
+		c := cell.String()
+		if printSpace {
+			c = " "
+		}
+		fmt.Printf("%s%s%s%s%s|", c, cell, cell, cell, c)
 	}
-	fmt.Println(s)
+	fmt.Println()
 }
 
 // Print prints a Board.
 func (b *Board) Print() {
+	c := exec.Command("clear")
+	c.Stdout = os.Stdout
+	c.Run()
+
 	printSep(b.width)
 	for h := b.height - 1; h >= 0; h-- {
-		for i := 0; i < 3; i++ {
-			fmt.Print("|")
-			for _, cell := range b.cells[h] {
-				fmt.Printf("%s%s%s%s|", cell, cell, cell, cell)
-			}
-			fmt.Println()
-		}
+		printRow(b.cells[h], true)
+		printRow(b.cells[h], false)
+		printRow(b.cells[h], false)
+		printRow(b.cells[h], true)
 		printSep(b.width)
 	}
 	for c := 0; c < b.width; c++ {
-		fmt.Printf("  %d  ", c+1)
+		fmt.Printf("   %d  ", c+1)
 	}
 	fmt.Println()
 }
@@ -73,8 +82,6 @@ func (b *Board) Move(column, player int) error {
 
 	made := false
 	for h := 0; h < b.height; h++ {
-		fmt.Printf("checking (%d, %d)\n", h, col)
-
 		if b.cells[h][col] != 0 {
 			continue
 		}
